@@ -87,17 +87,28 @@
                     </div>
                     <span class="text-gray-500 text-sm">Lade dir die Arbeitsblätter hier runter...</span>
                 </div>
-                    <a href="/uebungsblatt-1.pdf" download="uebungsblatt-1.pdf" class="file-card bg-white rounded-lg p-4 flex items-center justify-between shadow-sm no-underline text-gray-800">
-                        <div class="flex items-center space-x-4">
-                            <div class="icon-circle"><span class="material-icons">edit_note</span></div>
-                            <div>
-                                <h3 class="font-medium">Übungsaufgaben</h3>
-                                <p class="text-xs text-gray-500">uebungsblatt-1.pdf</p>
-                            </div>
+
+                <a href="/uebungsblatt-1.pdf" download="uebungsblatt-1.pdf" class="file-card bg-white rounded-lg p-4 flex items-center justify-between shadow-sm no-underline text-gray-800">
+                    <div class="flex items-center space-x-4">
+                        <div class="icon-circle"><span class="material-icons">edit_note</span></div>
+                        <div>
+                            <h3 class="font-medium">Übungsaufgaben 1</h3>
+                            <p class="text-xs text-gray-500">uebungsblatt-1.pdf</p>
                         </div>
-                        <span class="material-icons text-gray-400">download</span>
-                    </a>
-                </div>
+                    </div>
+                    <span class="material-icons text-gray-400">download</span>
+                </a>
+
+                <a href="/uebung-2.pdf" download="uebung-2.pdf" class="file-card bg-white rounded-lg p-4 flex items-center justify-between shadow-sm no-underline text-gray-800">
+                    <div class="flex items-center space-x-4">
+                        <div class="icon-circle"><span class="material-icons">edit_note</span></div>
+                        <div>
+                            <h3 class="font-medium">Übungsaufgaben 2</h3>
+                            <p class="text-xs text-gray-500">uebung-2.pdf</p>
+                        </div>
+                    </div>
+                    <span class="material-icons text-gray-400">download</span>
+                </a>
             </div>
         </div>
     </main>
@@ -113,8 +124,6 @@
                 const response = await fetch(url);
                 const blob = await response.blob();
                 
-                // wir erstellen einen neuen blob mit einem "falschen" mime-type
-                // application/octet-stream zwingt ios dazu, es als datei statt als vorschau zu behandeln
                 const forcedBlob = new Blob([blob], { type: 'application/octet-stream' });
                 const blobUrl = window.URL.createObjectURL(forcedBlob);
                 
@@ -130,11 +139,10 @@
                     a.remove();
                 }, 100);
             } catch (err) {
-                // falls fetch fehlschlägt (z.b. cors), normaler link-klick
                 window.location.href = url;
             }
         });
     });
-</script>
+    </script>
 </body>
 </html>
