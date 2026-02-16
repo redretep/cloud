@@ -138,30 +138,38 @@
     </main>
 
     <script>
-        document.querySelectorAll('a[download]').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const url = this.getAttribute('href');
-                const fileName = this.getAttribute('download') || 'datei.pdf';
+    document.querySelectorAll('a[download]').forEach(link => {
+        link.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const url = this.getAttribute('href');
+            const fileName = this.getAttribute('download') || 'datei.pdf';
 
-                fetch(url)
-                    .then(res => res.blob())
-                    .then(blob => {
-                        const blobUrl = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = blobUrl;
-                        a.download = fileName;
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(blobUrl);
-                        a.remove();
-                    })
-                    .catch(() => {
-                        window.location.href = url;
-                    });
-            });
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                
+                // wir erstellen einen neuen blob mit einem "falschen" mime-type
+                // application/octet-stream zwingt ios dazu, es als datei statt als vorschau zu behandeln
+                const forcedBlob = new Blob([blob], { type: 'application/octet-stream' });
+                const blobUrl = window.URL.createObjectURL(forcedBlob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(blobUrl);
+                    a.remove();
+                }, 100);
+            } catch (err) {
+                // falls fetch fehlschlägt (z.b. cors), normaler link-klick
+                window.location.href = url;
+            }
         });
-    </script>
+    });
+</script>
 </body>
 </html>
