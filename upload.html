@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material hochladen - PeterRoom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #3c4043;
+        }
+        .classroom-header {
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+            height: 64px;
+        }
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .banner {
+            background: #1e8e3e;
+            background-image: url('https://www.gstatic.com/classroom/themes/img_read.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 200px;
+            border-radius: 8px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15);
+        }
+        .card {
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+        }
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #5f6368;
+        }
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: #f1f3f4;
+            border: none;
+            border-bottom: 2px solid transparent;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.2s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            background: #e8eaed;
+            border-bottom: 2px solid #1e8e3e;
+        }
+        .btn-google {
+            background-color: #1e8e3e;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-google:hover {
+            background-color: #1b7e37;
+        }
+        .btn-google:disabled {
+            background-color: #bdc1c6;
+            cursor: not-allowed;
+        }
+        .file-drop-zone {
+            border: 2px dashed #dadce0;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .file-drop-zone:hover {
+            background: #f8f9fa;
+            border-color: #1e8e3e;
+        }
+        .hidden-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="classroom-header sticky top-0 z-50 px-6 flex items-center justify-between shadow-sm">
+        <div class="flex items-center space-x-4">
+            <button class="p-2 hover:bg-gray-100 rounded-full">
+                <span class="material-icons text-gray-600">menu</span>
+            </button>
+            <div class="flex items-center">
+                <span class="text-[22px] text-[#5f6368] font-normal">PeterRoom</span>
+                <span class="mx-2 text-gray-400">/</span>
+                <span class="text-lg text-gray-600">Lehrer-Konsole</span>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="clearConfig()" title="Einstellungen zurücksetzen" class="p-2 hover:bg-gray-100 rounded-full text-gray-600">
+                <span class="material-icons">logout</span>
+            </button>
+            <div class="w-8 h-8 rounded-full bg-[#1e8e3e] flex items-center justify-center text-white text-sm font-medium">L</div>
+        </div>
+    </header>
+
+    <main class="main-container p-4 md:p-8">
+        <div class="banner">
+            <h1 class="text-3xl font-medium mb-1">Materialien verwalten</h1>
+            <p class="text-sm opacity-100 font-normal">Lade neue Arbeitsblätter für deine Schüler hoch</p>
+        </div>
+
+        <!-- Setup Card -->
+        <div id="setup-section" class="card hidden border-l-4 border-l-blue-500">
+            <h2 class="text-xl font-medium mb-4 flex items-center text-blue-700">
+                <span class="material-icons mr-2">settings</span> GitHub Integration
+            </h2>
+            <div class="space-y-4">
+                <div class="input-group">
+                    <label>Personal Access Token (Classic)</label>
+                    <input type="password" id="gh-token" placeholder="ghp_...">
+                </div>
+                <div class="input-group">
+                    <label>Repository Pfad</label>
+                    <input type="text" id="gh-repo" placeholder="Nutzername/Projektname">
+                </div>
+                <button onclick="saveConfig()" class="btn-google bg-blue-600 hover:bg-blue-700">
+                    Verbindung herstellen
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Upload Form -->
+        <div id="upload-section" class="card">
+            <div id="status-msg" class="hidden mb-6 p-4 rounded-lg flex items-center transition-all duration-300"></div>
+
+            <div class="space-y-6">
+                <div class="input-group">
+                    <label>Titel des Materials</label>
+                    <input type="text" id="file-title" placeholder="z. B. 03_Binomische_Formeln_Aufgaben">
+                </div>
+
+                <div class="file-drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                    <span class="material-icons text-gray-400 text-5xl mb-2">cloud_upload</span>
+                    <p class="text-gray-600" id="file-info">Klicke hier, um eine Datei auszuwählen</p>
+                    <p class="text-xs text-gray-400 mt-1">PDF, Word oder Bilder werden empfohlen</p>
+                    <input type="file" id="file-input" class="hidden-input" onchange="updateFileInfo()">
+                </div>
+
+                <div class="input-group">
+                    <label>Ziel-Dateiname im Repository</label>
+                    <input type="text" id="file-name" placeholder="arbeitsblatt.pdf">
+                </div>
+
+                <div class="flex justify-end pt-4 border-t border-gray-100">
+                    <button id="upload-btn" onclick="handleUpload()" class="btn-google">
+                        <span class="material-icons mr-2 text-sm">publish</span>
+                        In Kursraum posten
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        window.onload = () => {
+            const token = localStorage.getItem('gh_token');
+            const repo = localStorage.getItem('gh_repo');
+            if (!token || !repo) {
+                document.getElementById('setup-section').classList.remove('hidden');
+            }
+        };
+
+        function updateFileInfo() {
+            const input = document.getElementById('file-input');
+            const info = document.getElementById('file-info');
+            const nameInput = document.getElementById('file-name');
+            
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                info.innerHTML = `<strong class="text-[#1e8e3e]">${file.name}</strong> ausgewählt`;
+                if (!nameInput.value) {
+                    nameInput.value = file.name.replace(/\s+/g, '_').toLowerCase();
+                }
+            }
+        }
+
+        function saveConfig() {
+            const token = document.getElementById('gh-token').value.trim();
+            const repo = document.getElementById('gh-repo').value.trim();
+            
+            if (token && repo) {
+                localStorage.setItem('gh_token', token);
+                localStorage.setItem('gh_repo', repo);
+                document.getElementById('setup-section').classList.add('hidden');
+                showStatus('Konfiguration erfolgreich gespeichert!', 'success');
+            } else {
+                showStatus('Bitte fülle alle Felder aus.', 'error');
+            }
+        }
+
+        function clearConfig() {
+            if(confirm('Möchtest du die GitHub-Zugangsdaten wirklich löschen?')) {
+                localStorage.removeItem('gh_token');
+                localStorage.removeItem('gh_repo');
+                location.reload();
+            }
+        }
+
+        function showStatus(msg, type) {
+            const el = document.getElementById('status-msg');
+            el.innerHTML = `<span class="material-icons mr-2">${type === 'success' ? 'check_circle' : 'error'}</span> ${msg}`;
+            
+            if (type === 'success') {
+                el.className = "mb-6 p-4 rounded-lg flex items-center bg-green-50 text-green-700 border border-green-200";
+            } else {
+                el.className = "mb-6 p-4 rounded-lg flex items-center bg-red-50 text-red-700 border border-red-200";
+            }
+            el.classList.remove('hidden');
+            
+            if(type === 'success') {
+                setTimeout(() => el.classList.add('hidden'), 5000);
+            }
+        }
+
+        async function handleUpload() {
+            const token = localStorage.getItem('gh_token');
+            const repo = localStorage.getItem('gh_repo');
+            const fileInput = document.getElementById('file-input');
+            const fileName = document.getElementById('file-name').value.trim();
+            const uploadBtn = document.getElementById('upload-btn');
+
+            if (!token || !repo) {
+                showStatus('GitHub Konfiguration fehlt.', 'error');
+                return;
+            }
+
+            if (fileInput.files.length === 0 || !fileName) {
+                showStatus('Bitte wähle eine Datei und gib einen Namen an.', 'error');
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<span class="material-icons animate-spin mr-2">sync</span> Hochladen...';
+
+            try {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    const content = reader.result.split(',')[1];
+                    const url = `https://api.github.com/repos/${repo}/contents/${fileName}`;
+                    
+                    // Check if file exists to get SHA (for updates)
+                    let sha = null;
+                    try {
+                        const checkRes = await fetch(url, {
+                            headers: { 'Authorization': `token ${token}` }
+                        });
+                        if (checkRes.ok) {
+                            const data = await checkRes.json();
+                            sha = data.sha;
+                        }
+                    } catch(e) {}
+
+                    const response = await fetch(url, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: `Material-Upload: ${fileName}`,
+                            content: content,
+                            sha: sha
+                        })
+                    });
+
+                    if (response.ok) {
+                        showStatus('Material erfolgreich gepostet!', 'success');
+                        document.getElementById('file-title').value = '';
+                        document.getElementById('file-name').value = '';
+                        fileInput.value = '';
+                        document.getElementById('file-info').textContent = 'Klicke hier, um eine Datei auszuwählen';
+                    } else {
+                        const err = await response.json();
+                        showStatus(`Fehler: ${err.message}`, 'error');
+                    }
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '<span class="material-icons mr-2 text-sm">publish</span> In Kursraum posten';
+                };
+            } catch (error) {
+                showStatus('Verbindung zu GitHub fehlgeschlagen.', 'error');
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<span class="material-icons mr-2 text-sm">publish</span> In Kursraum posten';
+            }
+        }
+    </script>
+</body>
+</html>
