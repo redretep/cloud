@@ -224,12 +224,7 @@
     }
 
     function checkAdmin() {
-        const code = prompt("verify that you are human, type: upload");
-        if (code === "upload") {
-             window.location.href = `https://github.com/${REPO_OWNER}/${REPO_NAME}/upload/main/${FOLDER_PATH}`;
-        } else if (code !== null) {
-            alert("Falscher Code!");
-        }
+             window.location.href = `https://pidicloud.vercel.app/upload.html`;
     }
 
     document.addEventListener('DOMContentLoaded', fetchRepoFiles);
