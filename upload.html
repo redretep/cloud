@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud Drive - Admin Panel</title>
+    <title>pidicloud - upload</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -109,9 +109,9 @@
             </button>
             <div class="flex items-center space-x-2">
                 <span class="material-icons text-blue-600">cloud</span>
-                <span class="text-[22px] text-[#5f6368] font-normal">Cloud Drive</span>
+                <span class="text-[22px] text-[#5f6368] font-normal">pidicloud</span>
                 <span class="mx-2 text-gray-400">/</span>
-                <span class="text-lg text-gray-600">Verwaltung</span>
+                <span class="text-lg text-gray-600">upload</span>
             </div>
         </div>
         <div class="flex items-center space-x-3">
@@ -124,51 +124,49 @@
 
     <main class="main-container p-4 md:p-8">
         <div class="banner">
-            <h1 class="text-3xl font-medium mb-1">Dateien hochladen</h1>
-            <p class="text-sm opacity-100 font-normal">Verwalte den /uploads Ordner deines Cloud-Speichers</p>
+            <h1 class="text-3xl font-medium mb-1">upload files</h1>
+            <p class="text-sm opacity-100 font-normal">to your <strong>/uploads</strong> folder</p>
         </div>
 
-        <!-- Setup Card -->
         <div id="setup-section" class="card hidden border-l-4 border-l-blue-500">
             <h2 class="text-xl font-medium mb-4 flex items-center text-blue-700">
-                <span class="material-icons mr-2">settings</span> Cloud Konfiguration
+                <span class="material-icons mr-2">settings</span> login
             </h2>
             <div class="space-y-4">
                 <div class="input-group">
-                    <label>GitHub Personal Access Token</label>
+                    <label>github personal access token:</label>
                     <input type="password" id="gh-token" placeholder="ghp_...">
                 </div>
                 <div class="input-group">
-                    <label>Repository (z.B. Nutzername/Projekt)</label>
-                    <input type="text" id="gh-repo" placeholder="redretep/cloud">
+                    <label>directory:</label>
+                    <input type="text" id="gh-repo" placeholder="username/repo">
                 </div>
                 <button onclick="saveConfig()" class="btn-google">
-                    Speicher verbinden
+                    save
                 </button>
             </div>
         </div>
 
-        <!-- Upload Form -->
         <div id="upload-section" class="card">
             <div id="status-msg" class="hidden mb-6 p-4 rounded-lg flex items-center transition-all duration-300"></div>
 
             <div class="space-y-6">
                 <div class="file-drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
                     <span class="material-icons text-gray-400 text-5xl mb-2">upload_file</span>
-                    <p class="text-gray-600" id="file-info">Datei auswählen oder hierher ziehen</p>
-                    <p class="text-xs text-gray-400 mt-1">Zielordner: <span class="font-mono bg-gray-100 px-1">/uploads</span></p>
+                    <p class="text-gray-600" id="file-info">upload or drag and drop files</p>
+                    <p class="text-xs text-gray-400 mt-1">folder: <span class="font-mono bg-gray-100 px-1">/uploads</span></p>
                     <input type="file" id="file-input" class="hidden-input" onchange="updateFileInfo()">
                 </div>
 
                 <div class="input-group">
-                    <label>Dateiname in der Cloud</label>
+                    <label>name inside the folder:</label>
                     <input type="text" id="file-name" placeholder="beispiel_datei.pdf">
                 </div>
 
                 <div class="flex justify-end pt-4 border-t border-gray-100">
                     <button id="upload-btn" onclick="handleUpload()" class="btn-google">
                         <span class="material-icons mr-2 text-sm">cloud_upload</span>
-                        In Cloud speichern
+                        upload
                     </button>
                 </div>
             </div>
@@ -193,7 +191,7 @@
             
             if (input.files.length > 0) {
                 const file = input.files[0];
-                info.innerHTML = `<strong class="text-blue-600">${file.name}</strong> bereit zum Upload`;
+                info.innerHTML = `<strong class="text-blue-600">${file.name}</strong> ready to upload`;
                 if (!nameInput.value) {
                     nameInput.value = file.name.replace(/\s+/g, '_').toLowerCase();
                 }
@@ -207,14 +205,14 @@
                 localStorage.setItem('gh_token', token);
                 localStorage.setItem('gh_repo', repo);
                 document.getElementById('setup-section').classList.add('hidden');
-                showStatus('Verbindung hergestellt!', 'success');
+                showStatus('connected', 'success');
             } else {
-                showStatus('Bitte alle Felder ausfüllen.', 'error');
+                showStatus('fill out everything.', 'error');
             }
         }
 
         function clearConfig() {
-            if(confirm('Möchtest du dich abmelden?')) {
+            if(confirm('do you want to log out?')) {
                 localStorage.removeItem('gh_token');
                 localStorage.removeItem('gh_repo');
                 location.reload();
@@ -237,17 +235,17 @@
             const uploadBtn = document.getElementById('upload-btn');
 
             if (!token || !repo) {
-                showStatus('Konfiguration fehlt.', 'error');
+                showStatus('not logged in.', 'error');
                 return;
             }
 
             if (fileInput.files.length === 0 || !fileName) {
-                showStatus('Wähle eine Datei und gib einen Namen an.', 'error');
+                showStatus('upload and name a file.', 'error');
                 return;
             }
 
             uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="material-icons animate-spin mr-2">sync</span> Lädt hoch...';
+            uploadBtn.innerHTML = '<span class="material-icons animate-spin mr-2">sync</span> uploading...';
 
             try {
                 const file = fileInput.files[0];
@@ -255,7 +253,6 @@
                 reader.readAsDataURL(file);
                 reader.onload = async () => {
                     const content = reader.result.split(',')[1];
-                    // Pfad wird hier erzwungen auf uploads/filename
                     const url = `https://api.github.com/repos/${repo}/contents/${UPLOAD_DIR}/${fileName}`;
                     
                     let sha = null;
@@ -276,28 +273,28 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            message: `Cloud Upload: ${fileName} via Admin Panel`,
+                            message: `upload: ${fileName} via website`,
                             content: content,
                             sha: sha
                         })
                     });
 
                     if (response.ok) {
-                        showStatus('Datei erfolgreich in /uploads gespeichert!', 'success');
+                        showStatus('succesfully uploaded to /uploads folder!', 'success');
                         document.getElementById('file-name').value = '';
                         fileInput.value = '';
-                        document.getElementById('file-info').textContent = 'Datei auswählen oder hierher ziehen';
+                        document.getElementById('file-info').textContent = 'upload or drag and drop file';
                     } else {
                         const err = await response.json();
                         showStatus(`Fehler: ${err.message}`, 'error');
                     }
                     uploadBtn.disabled = false;
-                    uploadBtn.innerHTML = '<span class="material-icons mr-2 text-sm">cloud_upload</span> In Cloud speichern';
+                    uploadBtn.innerHTML = '<span class="material-icons mr-2 text-sm">cloud_upload</span> upload';
                 };
             } catch (error) {
                 showStatus('Netzwerkfehler.', 'error');
                 uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<span class="material-icons mr-2 text-sm">cloud_upload</span> In Cloud speichern';
+                uploadBtn.innerHTML = '<span class="material-icons mr-2 text-sm">cloud_upload</span> upload';
             }
         }
     </script>
