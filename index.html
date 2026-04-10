@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Materialien - Cloud</title>
+    <title>pidicloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -76,7 +76,7 @@
             <button class="p-2 hover:bg-gray-100 rounded-full">
                 <span class="material-icons text-gray-600">menu</span>
             </button>
-            <span class="text-xl text-gray-600 font-medium">PeterRoom Cloud</span>
+            <span class="text-xl text-gray-600 font-medium">pidicloud</span>
         </div>
         <div class="flex items-center space-x-2">
             <button onclick="fetchRepoFiles()" class="p-2 hover:bg-gray-100 rounded-full group" title="Dateien aktualisieren">
@@ -92,8 +92,8 @@
     <main class="max-w-5xl mx-auto p-4 md:p-8">
         <div class="banner shadow-sm">
             <div>
-                <h1 class="text-3xl font-bold">Materialien & Downloads</h1>
-                <p class="text-lg opacity-90">Ordner: uploads</p>
+                <h1 class="text-3xl font-bold">stored files</h1>
+                <p class="text-lg opacity-90">folder: uploads</p>
             </div>
         </div>
 
@@ -101,9 +101,9 @@
             <div class="hidden md:block col-span-1">
                 <div class="bg-white border border-gray-300 rounded-lg p-4 mb-4">
                     <h2 class="text-sm font-medium text-gray-700 mb-2">Info</h2>
-                    <p class="text-xs text-gray-500 mb-4">Alle Dateien werden direkt aus dem <strong>uploads</strong> Ordner geladen.</p>
+                    <p class="text-xs text-gray-500 mb-4">all files are fetched from the <strong>uploads</strong> folder</p>
                     <hr class="mb-4">
-                    <a href="https://github.com/redretep/cloud" target="_blank" class="block text-blue-600 text-sm font-medium hover:underline">GitHub Repo öffnen</a>
+                    <a href="https://github.com/redretep/cloud" target="_blank" class="block text-blue-600 text-sm font-medium hover:underline">open github repo</a>
                 </div>
             </div>
 
@@ -112,14 +112,13 @@
                     </div>
 
                 <div id="error-message" class="hidden p-4 bg-red-100 text-red-700 rounded-lg border border-red-200">
-                    Fehler beim Laden der Dateien. Stelle sicher, dass der Ordner "uploads" im Repository existiert.
+                    error when loading repo. check if the uploads folder exists.
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-    // Konfiguration für den spezifischen Pfad
     const REPO_OWNER = "redretep";
     const REPO_NAME = "cloud";
     const FOLDER_PATH = "uploads"; 
@@ -134,11 +133,10 @@
         errorMsg.classList.add('hidden');
 
         try {
-            // Korrekte GitHub API URL für einen spezifischen Unterordner
             const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FOLDER_PATH}?t=${Date.now()}`;
             const response = await fetch(apiUrl);
             
-            if (!response.ok) throw new Error('Ordner nicht gefunden oder API Limit erreicht');
+            if (!response.ok) throw new Error('folder not found or rate limit exceeded');
             
             const files = await response.json();
             renderFiles(files);
@@ -180,7 +178,7 @@
         const filteredFiles = files.filter(file => file.type === 'file');
 
         if (filteredFiles.length === 0) {
-            container.innerHTML = "<p class='text-center py-10 text-gray-500'>Keine Dateien im Ordner 'uploads' gefunden.</p>";
+            container.innerHTML = "<p class='text-center py-10 text-gray-500'>no files found in uploads folder.</p>";
             return;
         }
 
@@ -226,9 +224,8 @@
     }
 
     function checkAdmin() {
-        const code = prompt("Bitte Geheimcode eingeben:");
-        if (code === "2011") {
-             // Leitet direkt zum Upload-Interface in den uploads-Ordner weiter
+        const code = prompt("verify that you are human, type: upload");
+        if (code === "upload") {
              window.location.href = `https://github.com/${REPO_OWNER}/${REPO_NAME}/upload/main/${FOLDER_PATH}`;
         } else if (code !== null) {
             alert("Falscher Code!");
