@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Materialien</title>
+    <title>Materialien - Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -27,12 +27,13 @@
             margin-bottom: 24px;
         }
         .file-card {
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             border: 1px solid #dadce0;
         }
         .file-card:hover {
             background-color: #f1f3f4;
-            cursor: pointer;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .icon-circle {
             background-color: #1967d2;
@@ -44,6 +45,28 @@
             align-items: center;
             justify-content: center;
         }
+        #loading-spinner {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1967d2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .rotate-icon {
+            transition: transform 0.5s ease;
+        }
+        .rotate-icon.active {
+            transform: rotate(360deg);
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -53,13 +76,16 @@
             <button class="p-2 hover:bg-gray-100 rounded-full">
                 <span class="material-icons text-gray-600">menu</span>
             </button>
-            <span class="text-xl text-gray-600 font-medium">PeterRoom (sicher, privat)</span>
+            <span class="text-xl text-gray-600 font-medium">PeterRoom Cloud</span>
         </div>
         <div class="flex items-center space-x-2">
-            <button onclick="checkAdmin()" class="p-2 hover:bg-gray-100 rounded-full">
+            <!-- Reload Button -->
+            <button onclick="fetchRepoFiles()" class="p-2 hover:bg-gray-100 rounded-full group" title="Dateien aktualisieren">
+                <span id="reload-icon" class="material-icons text-gray-600 rotate-icon">refresh</span>
+            </button>
+            <button onclick="checkAdmin()" class="p-2 hover:bg-gray-100 rounded-full" title="Datei hinzufügen">
                 <span class="material-icons text-gray-600">add</span>
             </button>
-            <button class="p-2 hover:bg-gray-100 rounded-full"><span class="material-icons text-gray-600">apps</span></button>
             <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm">U</div>
         </div>
     </header>
@@ -68,95 +94,165 @@
         <div class="banner shadow-sm">
             <div>
                 <h1 class="text-3xl font-bold">Materialien & Downloads</h1>
-                <p class="text-lg opacity-90">Arbeitsblätter für die Stunde</p>
+                <p class="text-lg opacity-90">Cloud-Repository: redretep/cloud</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="hidden md:block col-span-1">
                 <div class="bg-white border border-gray-300 rounded-lg p-4 mb-4">
-                    <h2 class="text-sm font-medium text-gray-700 mb-4">Google Classroom Alternative</h2>
-                    <p class="text-xs text-gray-500 italic">privat & made in germany</p>
-                    <a href="https://redretep.github.io" class="block mt-4 text-blue-600 text-sm font-medium hover:underline text-right">made by peter</a>
+                    <h2 class="text-sm font-medium text-gray-700 mb-2">Info</h2>
+                    <p class="text-xs text-gray-500 mb-4">Alle Dateien werden direkt aus GitHub geladen. Änderungen im Repo erscheinen hier sofort.</p>
+                    <hr class="mb-4">
+                    <a href="https://github.com/redretep/cloud" target="_blank" class="block text-blue-600 text-sm font-medium hover:underline">GitHub Repo öffnen</a>
                 </div>
             </div>
 
             <div class="col-span-1 md:col-span-3 space-y-4">
                 <div class="bg-white border border-gray-300 rounded-lg p-4 shadow-sm flex items-center space-x-4 mb-6">
-                    <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                        <div class="w-full h-full flex items-center justify-center text-gray-500 bg-blue-100">
-                             <span class="material-icons">person</span>
-                        </div>
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                         <span class="material-icons">cloud_download</span>
                     </div>
-                    <span class="text-gray-500 text-sm">Lade dir die Arbeitsblätter hier runter...</span>
+                    <span class="text-gray-500 text-sm">Wähle eine Datei aus dem Repository zum Herunterladen aus:</span>
                 </div>
 
-                <a href="/uebungsblatt-1.pdf" download="uebungsblatt-1.pdf" class="file-card bg-white rounded-lg p-4 flex items-center justify-between shadow-sm no-underline text-gray-800">
-                    <div class="flex items-center space-x-4">
-                        <div class="icon-circle"><span class="material-icons">edit_note</span></div>
-                        <div>
-                            <h3 class="font-medium">Übungsaufgaben 1</h3>
-                            <p class="text-xs text-gray-500">uebungsblatt-1.pdf</p>
-                        </div>
-                    </div>
-                    <span class="material-icons text-gray-400">download</span>
-                </a>
+                <!-- Container für die dynamisch geladenen Dateien -->
+                <div id="file-list-container" class="space-y-3">
+                    <!-- Spinner wird initial angezeigt -->
+                </div>
 
-                <a href="/uebung-2.pdf" download="uebung-2.pdf" class="file-card bg-white rounded-lg p-4 flex items-center justify-between shadow-sm no-underline text-gray-800">
-                    <div class="flex items-center space-x-4">
-                        <div class="icon-circle"><span class="material-icons">edit_note</span></div>
-                        <div>
-                            <h3 class="font-medium">Übungsaufgaben 2</h3>
-                            <p class="text-xs text-gray-500">uebung-2.pdf</p>
-                        </div>
-                    </div>
-                    <span class="material-icons text-gray-400">download</span>
-                </a>
+                <div id="error-message" class="hidden p-4 bg-red-100 text-red-700 rounded-lg border border-red-200">
+                    Fehler beim Laden der Dateien. Stelle sicher, dass das Repository öffentlich zugänglich ist.
+                </div>
             </div>
         </div>
     </main>
 
     <script>
-    // admin check funktion
-    function checkAdmin() {
-        const code = prompt("bitte geheimcode eingeben:");
-        if (code === "2011") {
-            window.location.href = "upload.html";
-        } else if (code !== null) {
-            alert("falscher code!");
+    const GITHUB_REPO = "redretep/cloud/uploads";
+    const container = document.getElementById('file-list-container');
+    const errorMsg = document.getElementById('error-message');
+    const reloadIcon = document.getElementById('reload-icon');
+
+    // Funktion zum Abrufen der Dateien von der GitHub API
+    async function fetchRepoFiles() {
+        // UI-Feedback: Spinner zeigen und Icon drehen
+        showLoading();
+        reloadIcon.classList.add('active');
+        errorMsg.classList.add('hidden');
+
+        try {
+            // Cache umgehen durch Zeitstempel
+            const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/?t=${Date.now()}`);
+            
+            if (!response.ok) throw new Error('Repository nicht gefunden oder API Limit erreicht');
+            
+            const files = await response.json();
+            renderFiles(files);
+        } catch (err) {
+            console.error(err);
+            container.innerHTML = "";
+            errorMsg.classList.remove('hidden');
+        } finally {
+            // Animation zurücksetzen
+            setTimeout(() => reloadIcon.classList.remove('active'), 500);
         }
     }
 
-    // download handling
-    document.querySelectorAll('a[download]').forEach(link => {
-        link.addEventListener('click', async function(e) {
-            e.preventDefault();
-            const url = this.getAttribute('href');
-            const fileName = this.getAttribute('download') || 'datei.pdf';
+    function showLoading() {
+        container.innerHTML = `
+            <div id="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+        `;
+    }
 
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                
-                const forcedBlob = new Blob([blob], { type: 'application/octet-stream' });
-                const blobUrl = window.URL.createObjectURL(forcedBlob);
-                
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = blobUrl;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                
-                setTimeout(() => {
-                    window.URL.revokeObjectURL(blobUrl);
-                    a.remove();
-                }, 100);
-            } catch (err) {
-                window.location.href = url;
-            }
+    // Funktion zum Bestimmen des Icons basierend auf der Dateiendung
+    function getFileIcon(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        switch(ext) {
+            case 'pdf': return 'picture_as_pdf';
+            case 'jpg':
+            case 'jpeg':
+            case 'png': return 'image';
+            case 'zip':
+            case 'rar': return 'inventory_2';
+            case 'txt': return 'description';
+            case 'docx':
+            case 'doc': return 'article';
+            default: return 'insert_drive_file';
+        }
+    }
+
+    // Dateien in das HTML rendern
+    function renderFiles(files) {
+        container.innerHTML = "";
+        
+        // Filter: Nur Dateien anzeigen
+        const filteredFiles = files.filter(file => file.type === 'file');
+
+        if (filteredFiles.length === 0) {
+            container.innerHTML = "<p class='text-center py-10 text-gray-500'>Keine Dateien im Repository gefunden.</p>";
+            return;
+        }
+
+        filteredFiles.forEach(file => {
+            const card = document.createElement('div');
+            card.className = "file-card bg-white rounded-lg p-4 flex items-center justify-between shadow-sm cursor-pointer";
+            
+            card.onclick = () => downloadFile(file.download_url, file.name);
+
+            card.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <div class="icon-circle">
+                        <span class="material-icons">${getFileIcon(file.name)}</span>
+                    </div>
+                    <div class="overflow-hidden">
+                        <h3 class="font-medium text-gray-800 truncate">${file.name}</h3>
+                        <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                </div>
+                <span class="material-icons text-gray-400">download</span>
+            `;
+            container.appendChild(card);
         });
-    });
+    }
+
+    // Download Handler
+    async function downloadFile(url, fileName) {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = blobUrl;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                window.URL.revokeObjectURL(blobUrl);
+                a.remove();
+            }, 100);
+        } catch (err) {
+            window.open(url, '_blank');
+        }
+    }
+
+    // Admin check funktion
+    function checkAdmin() {
+        const code = prompt("Bitte Geheimcode eingeben:");
+        if (code === "2011") {
+             window.location.href = `https://github.com/${GITHUB_REPO}/upload/main`;
+        } else if (code !== null) {
+            alert("Falscher Code!");
+        }
+    }
+
+    // Initialisierung
+    document.addEventListener('DOMContentLoaded', fetchRepoFiles);
     </script>
 </body>
 </html>
