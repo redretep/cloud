@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Material hochladen - PeterRoom</title>
+    <title>Cloud Drive - Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -12,7 +12,7 @@
             background-color: #ffffff;
             color: #3c4043;
         }
-        .classroom-header {
+        .drive-header {
             border-bottom: 1px solid #e0e0e0;
             background: white;
             height: 64px;
@@ -22,19 +22,20 @@
             margin: 0 auto;
         }
         .banner {
-            background: #1e8e3e;
-            background-image: url('https://www.gstatic.com/classroom/themes/img_read.jpg');
-            background-size: cover;
-            background-position: center;
-            height: 200px;
+            background: #1a73e8;
+            background-image: linear-gradient(rgba(26, 115, 232, 0.8), rgba(26, 115, 232, 0.8)), url('https://www.gstatic.com/images/branding/product/2x/drive_2020q4_48dp.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: right 24px center;
+            height: 160px;
             border-radius: 8px;
             color: white;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
+            justify-content: center;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15);
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,.3);
         }
         .card {
             background: white;
@@ -42,10 +43,6 @@
             border-radius: 8px;
             padding: 24px;
             margin-bottom: 16px;
-            transition: box-shadow 0.2s;
-        }
-        .card:hover {
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
         }
         .input-group label {
             display: block;
@@ -54,7 +51,7 @@
             margin-bottom: 8px;
             color: #5f6368;
         }
-        input[type="text"], input[type="password"], textarea {
+        input[type="text"], input[type="password"] {
             width: 100%;
             padding: 12px 16px;
             background: #f1f3f4;
@@ -63,13 +60,13 @@
             border-radius: 4px 4px 0 0;
             transition: all 0.2s;
         }
-        input:focus, textarea:focus {
+        input:focus {
             outline: none;
             background: #e8eaed;
-            border-bottom: 2px solid #1e8e3e;
+            border-bottom: 2px solid #1a73e8;
         }
         .btn-google {
-            background-color: #1e8e3e;
+            background-color: #1a73e8;
             color: white;
             padding: 10px 24px;
             border-radius: 4px;
@@ -80,7 +77,7 @@
             transition: background-color 0.2s;
         }
         .btn-google:hover {
-            background-color: #1b7e37;
+            background-color: #1765cc;
         }
         .btn-google:disabled {
             background-color: #bdc1c6;
@@ -96,7 +93,7 @@
         }
         .file-drop-zone:hover {
             background: #f8f9fa;
-            border-color: #1e8e3e;
+            border-color: #1a73e8;
         }
         .hidden-input {
             display: none;
@@ -105,77 +102,73 @@
 </head>
 <body>
 
-    <header class="classroom-header sticky top-0 z-50 px-6 flex items-center justify-between shadow-sm">
+    <header class="drive-header sticky top-0 z-50 px-6 flex items-center justify-between shadow-sm">
         <div class="flex items-center space-x-4">
             <button class="p-2 hover:bg-gray-100 rounded-full">
                 <span class="material-icons text-gray-600">menu</span>
             </button>
-            <div class="flex items-center">
-                <span class="text-[22px] text-[#5f6368] font-normal">PeterRoom</span>
+            <div class="flex items-center space-x-2">
+                <span class="material-icons text-blue-600">cloud</span>
+                <span class="text-[22px] text-[#5f6368] font-normal">Cloud Drive</span>
                 <span class="mx-2 text-gray-400">/</span>
-                <span class="text-lg text-gray-600">Lehrer-Konsole</span>
+                <span class="text-lg text-gray-600">Verwaltung</span>
             </div>
         </div>
         <div class="flex items-center space-x-3">
-            <button onclick="clearConfig()" title="Einstellungen zurücksetzen" class="p-2 hover:bg-gray-100 rounded-full text-gray-600">
+            <button onclick="clearConfig()" title="Abmelden" class="p-2 hover:bg-gray-100 rounded-full text-gray-600">
                 <span class="material-icons">logout</span>
             </button>
-            <div class="w-8 h-8 rounded-full bg-[#1e8e3e] flex items-center justify-center text-white text-sm font-medium">L</div>
+            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">A</div>
         </div>
     </header>
 
     <main class="main-container p-4 md:p-8">
         <div class="banner">
-            <h1 class="text-3xl font-medium mb-1">Materialien verwalten</h1>
-            <p class="text-sm opacity-100 font-normal">Lade neue Arbeitsblätter für deine Schüler hoch</p>
+            <h1 class="text-3xl font-medium mb-1">Dateien hochladen</h1>
+            <p class="text-sm opacity-100 font-normal">Verwalte den /uploads Ordner deines Cloud-Speichers</p>
         </div>
 
         <!-- Setup Card -->
         <div id="setup-section" class="card hidden border-l-4 border-l-blue-500">
             <h2 class="text-xl font-medium mb-4 flex items-center text-blue-700">
-                <span class="material-icons mr-2">settings</span> GitHub Integration
+                <span class="material-icons mr-2">settings</span> Cloud Konfiguration
             </h2>
             <div class="space-y-4">
                 <div class="input-group">
-                    <label>Personal Access Token (Classic)</label>
+                    <label>GitHub Personal Access Token</label>
                     <input type="password" id="gh-token" placeholder="ghp_...">
                 </div>
                 <div class="input-group">
-                    <label>Repository Pfad</label>
-                    <input type="text" id="gh-repo" placeholder="Nutzername/Projektname">
+                    <label>Repository (z.B. Nutzername/Projekt)</label>
+                    <input type="text" id="gh-repo" placeholder="redretep/cloud">
                 </div>
-                <button onclick="saveConfig()" class="btn-google bg-blue-600 hover:bg-blue-700">
-                    Verbindung herstellen
+                <button onclick="saveConfig()" class="btn-google">
+                    Speicher verbinden
                 </button>
             </div>
         </div>
 
-        <!-- Main Upload Form -->
+        <!-- Upload Form -->
         <div id="upload-section" class="card">
             <div id="status-msg" class="hidden mb-6 p-4 rounded-lg flex items-center transition-all duration-300"></div>
 
             <div class="space-y-6">
-                <div class="input-group">
-                    <label>Titel des Materials</label>
-                    <input type="text" id="file-title" placeholder="z. B. 03_Binomische_Formeln_Aufgaben">
-                </div>
-
                 <div class="file-drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-                    <span class="material-icons text-gray-400 text-5xl mb-2">cloud_upload</span>
-                    <p class="text-gray-600" id="file-info">Klicke hier, um eine Datei auszuwählen</p>
-                    <p class="text-xs text-gray-400 mt-1">PDF, Word oder Bilder werden empfohlen</p>
+                    <span class="material-icons text-gray-400 text-5xl mb-2">upload_file</span>
+                    <p class="text-gray-600" id="file-info">Datei auswählen oder hierher ziehen</p>
+                    <p class="text-xs text-gray-400 mt-1">Zielordner: <span class="font-mono bg-gray-100 px-1">/uploads</span></p>
                     <input type="file" id="file-input" class="hidden-input" onchange="updateFileInfo()">
                 </div>
 
                 <div class="input-group">
-                    <label>Ziel-Dateiname im Repository</label>
-                    <input type="text" id="file-name" placeholder="arbeitsblatt.pdf">
+                    <label>Dateiname in der Cloud</label>
+                    <input type="text" id="file-name" placeholder="beispiel_datei.pdf">
                 </div>
 
                 <div class="flex justify-end pt-4 border-t border-gray-100">
                     <button id="upload-btn" onclick="handleUpload()" class="btn-google">
-                        <span class="material-icons mr-2 text-sm">publish</span>
-                        In Kursraum posten
+                        <span class="material-icons mr-2 text-sm">cloud_upload</span>
+                        In Cloud speichern
                     </button>
                 </div>
             </div>
@@ -183,6 +176,8 @@
     </main>
 
     <script>
+        const UPLOAD_DIR = "uploads";
+
         window.onload = () => {
             const token = localStorage.getItem('gh_token');
             const repo = localStorage.getItem('gh_repo');
@@ -198,7 +193,7 @@
             
             if (input.files.length > 0) {
                 const file = input.files[0];
-                info.innerHTML = `<strong class="text-[#1e8e3e]">${file.name}</strong> ausgewählt`;
+                info.innerHTML = `<strong class="text-blue-600">${file.name}</strong> bereit zum Upload`;
                 if (!nameInput.value) {
                     nameInput.value = file.name.replace(/\s+/g, '_').toLowerCase();
                 }
@@ -208,19 +203,18 @@
         function saveConfig() {
             const token = document.getElementById('gh-token').value.trim();
             const repo = document.getElementById('gh-repo').value.trim();
-            
             if (token && repo) {
                 localStorage.setItem('gh_token', token);
                 localStorage.setItem('gh_repo', repo);
                 document.getElementById('setup-section').classList.add('hidden');
-                showStatus('Konfiguration erfolgreich gespeichert!', 'success');
+                showStatus('Verbindung hergestellt!', 'success');
             } else {
-                showStatus('Bitte fülle alle Felder aus.', 'error');
+                showStatus('Bitte alle Felder ausfüllen.', 'error');
             }
         }
 
         function clearConfig() {
-            if(confirm('Möchtest du die GitHub-Zugangsdaten wirklich löschen?')) {
+            if(confirm('Möchtest du dich abmelden?')) {
                 localStorage.removeItem('gh_token');
                 localStorage.removeItem('gh_repo');
                 location.reload();
@@ -230,17 +224,9 @@
         function showStatus(msg, type) {
             const el = document.getElementById('status-msg');
             el.innerHTML = `<span class="material-icons mr-2">${type === 'success' ? 'check_circle' : 'error'}</span> ${msg}`;
-            
-            if (type === 'success') {
-                el.className = "mb-6 p-4 rounded-lg flex items-center bg-green-50 text-green-700 border border-green-200";
-            } else {
-                el.className = "mb-6 p-4 rounded-lg flex items-center bg-red-50 text-red-700 border border-red-200";
-            }
+            el.className = `mb-6 p-4 rounded-lg flex items-center border ${type === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`;
             el.classList.remove('hidden');
-            
-            if(type === 'success') {
-                setTimeout(() => el.classList.add('hidden'), 5000);
-            }
+            if(type === 'success') setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
         async function handleUpload() {
@@ -251,17 +237,17 @@
             const uploadBtn = document.getElementById('upload-btn');
 
             if (!token || !repo) {
-                showStatus('GitHub Konfiguration fehlt.', 'error');
+                showStatus('Konfiguration fehlt.', 'error');
                 return;
             }
 
             if (fileInput.files.length === 0 || !fileName) {
-                showStatus('Bitte wähle eine Datei und gib einen Namen an.', 'error');
+                showStatus('Wähle eine Datei und gib einen Namen an.', 'error');
                 return;
             }
 
             uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="material-icons animate-spin mr-2">sync</span> Hochladen...';
+            uploadBtn.innerHTML = '<span class="material-icons animate-spin mr-2">sync</span> Lädt hoch...';
 
             try {
                 const file = fileInput.files[0];
@@ -269,9 +255,9 @@
                 reader.readAsDataURL(file);
                 reader.onload = async () => {
                     const content = reader.result.split(',')[1];
-                    const url = `https://api.github.com/repos/${repo}/contents/${fileName}`;
+                    // Pfad wird hier erzwungen auf uploads/filename
+                    const url = `https://api.github.com/repos/${repo}/contents/${UPLOAD_DIR}/${fileName}`;
                     
-                    // Check if file exists to get SHA (for updates)
                     let sha = null;
                     try {
                         const checkRes = await fetch(url, {
@@ -290,29 +276,28 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            message: `Material-Upload: ${fileName}`,
+                            message: `Cloud Upload: ${fileName} via Admin Panel`,
                             content: content,
                             sha: sha
                         })
                     });
 
                     if (response.ok) {
-                        showStatus('Material erfolgreich gepostet!', 'success');
-                        document.getElementById('file-title').value = '';
+                        showStatus('Datei erfolgreich in /uploads gespeichert!', 'success');
                         document.getElementById('file-name').value = '';
                         fileInput.value = '';
-                        document.getElementById('file-info').textContent = 'Klicke hier, um eine Datei auszuwählen';
+                        document.getElementById('file-info').textContent = 'Datei auswählen oder hierher ziehen';
                     } else {
                         const err = await response.json();
                         showStatus(`Fehler: ${err.message}`, 'error');
                     }
                     uploadBtn.disabled = false;
-                    uploadBtn.innerHTML = '<span class="material-icons mr-2 text-sm">publish</span> In Kursraum posten';
+                    uploadBtn.innerHTML = '<span class="material-icons mr-2 text-sm">cloud_upload</span> In Cloud speichern';
                 };
             } catch (error) {
-                showStatus('Verbindung zu GitHub fehlgeschlagen.', 'error');
+                showStatus('Netzwerkfehler.', 'error');
                 uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<span class="material-icons mr-2 text-sm">publish</span> In Kursraum posten';
+                uploadBtn.innerHTML = '<span class="material-icons mr-2 text-sm">cloud_upload</span> In Cloud speichern';
             }
         }
     </script>
